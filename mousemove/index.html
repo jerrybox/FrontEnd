@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Don't resize me, i'm ticklish!</title>
+	<style type="text/css">
+	</style>
+	<script type="text/javascript">
+		function resize() {
+			var element = document.getElementById("display");
+			element.innerHTML = element.innerHTML + " that tickles!";
+		}
+	</script>
+</head>
+<body>
+	<p id="display">
+		Whatever you do, don't resize this window! i'm warning you !
+	</p>
+	<p id="messsage"></p>
+	<script type="text/javascript">
+		window.onresize = resize;
+		var el = document.getElementById("display");
+		el.onmousemove = showCoor;
+		function showCoor(eventObj) {
+			var x = eventObj.clientX;
+			var y = eventObj.clientY;
+			var message = document.getElementById("messsage");
+			messsage.innerHTML = "x:" + x +";" +"y:"+y;
+		}
+	</script>
+</body>
+</html>

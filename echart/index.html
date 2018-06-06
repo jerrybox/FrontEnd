@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Line Chart Sample</title>
+</head>
+<body>
+	<div style="text-align:center;"><h2>Line Chart Sample</h2></div>
+	<p id="container" style="height: 600px; width:1000px; border: solid black 1px; margin:auto; "></p>
+
+	<script src="echarts.common.min.js"></script>
+	<script type="text/javascript">
+		var dom = document.getElementById("container");
+	  	var myChart = echarts.init(dom);
+	  	var app = {};
+	  	option = null;
+	  	option = {
+	      	xAxis: {
+	          	type: 'category',
+	          	data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', '666']
+	          	},
+	          	yAxis: {
+	              	type: 'value'
+	          	},
+	          	series: [{
+	              	data: [820, 932, 901, 934, 1990, 1330, 1320, 666],
+	              	type: 'line'
+	          	}]
+	  	  	};
+	  	;
+	  	if (option && typeof option === "object") {
+	      	myChart.setOption(option, true);
+	  	}
+	</script>
+</body>
+</html>
