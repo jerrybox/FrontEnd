@@ -32,6 +32,49 @@
 
         ```
 
+2. 函数的参数可以是一个函数定义语句，而不必须是一个变量（与Python不同）：
+
+    - 参数是一个匿名函数：
+    ```js
+
+    $(document).ready(
+
+    function(){
+        alert("Hello World!");
+    }
+
+    );
+
+
+    $('ul li').click(
+
+    function(){
+        alert($(this).html());
+    }
+
+    );
+
+    ```
+
+3. 元素集合，通过下标索引获取。就会变成DOM对象
+
+    ```js
+    $("body").children().length;
+
+    var option_list = $("#multiple").children(); // 这不是一个一般的list，
+    $("#multiple").children()[0];  // <option selected="selected">选择1号</option>
+
+    for (i=0;i<option_list.length;i++){
+        console.log(option_list[i].innerHTML);  # 这里的option_list[i]为什么不能使用html()等jquery方法？
+    }
+    ```
+
+4. Jquery的事件方法名通常比JS原生方法少一个on
+
+    |  num  |   js  | jquery |
+    |-------|-------|--------|
+    |  1  |   onload  | load |
+    |  2  |   onclick  | click |
 
 
 ### Sharp Jquery 
@@ -56,7 +99,7 @@
 
 1. 适用性高：
 
-    - 方法同时适用于单个对象与多个对象
+    - 很多方法同时适用于单个对象与多个对象
         ```js
         $("#one").css("background", "#bbffaa");
         // $(".one") 如果返回来一个对象就设置一个对象的css，返回多个对象就设置多个对象的css；
@@ -122,7 +165,7 @@
     $("#id\\#b")
     ```
 
-3.  链式操作的返回值，取决于最后一个选择器方法的返回对象，这些纯操作函数（remove）不会影响最终返回的jquery对象
+3.  【难点】链式操作的返回值，取决于最后一个选择器方法的返回对象，这些纯操作函数（remove）不会影响最终返回的jquery对象
 
     ```js
         // remove() 会删除匹配到的元素，返回值取决于remove()函数前面作用的对象是什么，就返回什么。
@@ -240,7 +283,7 @@
         ```
 
 
-2. 2.3.3 过滤选择器，伪类选择器：
+2. 2.3.3 过滤选择器：
 
     - 基本过滤选择器：(顺序，状态)(冒号前面没有空格，代表是从已经选择到了元素集中选出要的元素)
         ```js
@@ -342,8 +385,8 @@
 
 3. 2.3.4 表单选择器
     
-    > Jquery中专门加入了表单选择器  
-    > :input_type 根据输入框类型选择元素  
+    Jquery中专门加入了表单选择器    
+    :input_type 根据输入框类型选择元素    
 
     ```js
     $("#form1 :input").length;  # 选择所有的input、textarea、select、button元素
@@ -356,21 +399,19 @@
 
 ### Chapter 3 DOM操作
 
+    DOM操作分3个方面： DOM Core，HTML-DOM和CSS-DOM
 
 1. 3.2.1 查找节点：
     
     - 查找元素节点：
         ```js
-
         $("#id").text()
-
         $("select :selected").text(); # 这个显示出了三个input的三个文本，三个文本一行显示
         // 湖南天津北京
         $("select :selected").html()
         // 湖南
         $("select :selected").length
         // 3
-
         $('.stat_table tr:nth-child(27)').text() # 这个显示出了tr内部5个<td></td>内的文本，每行显示一个文本
         /*
                   26
@@ -378,8 +419,8 @@
                   1
                   3
                   0
-       */
-       $('.stat_table tr:nth-child(26)').html()
+        */
+        $('.stat_table tr:nth-child(26)').html()
         /*
                   <td>25</td>
                   <td>宁夏回族自治区</td>
@@ -387,16 +428,13 @@
                   <td>2</td>
                   <td>0</td>
         */
-
         $('.stat_table tr:nth-child(27)').length
         // 1
-
         ```
 
     - 查找属性节点：
         ```js
         $("#id").attr('attr_name');
-
         $("#id").attr('attr_namme', 'attr_value');
         ```
 
@@ -408,6 +446,7 @@
         var $li_obj = $("<li></li>");
         $("ul").append($li_obj);
         ```
+
     - 创建文本节点：
         ```js
         var $li_obj = $("<li>文本内容</li>");
@@ -445,15 +484,401 @@
 
 4. 3.2.4 删除节点：
 
-    - remove() 会删除匹配到的元素，返回值取决于remove()函数前面作用的对象是什么，就返回什么。
-    ```js
-    var $li_2 = $("ul li:eq(1)").remove();  # 删除第二个元素,并返回这个元素的jquery对象
-    $li_2.appendTo("ul"); # 将删除了的这个元素追加到ul内部的最后面
+    - remove() 【难点】会删除匹配到的元素，返回值取决于remove()函数前面作用的对象是什么，就返回什么。
+        ```js
+        var $li_2 = $("ul li:eq(1)").remove();  # 删除第二个元素,并返回这个元素的jquery对象
+        $li_2.appendTo("ul"); # 将删除了的这个元素追加到ul内部的最后面
 
-    $("ul li").remove("li[title!=菠萝]") # 删除二个元素,没有返回删除的元素的jquery对象，返回的是$("ul li")对象
+        $("ul li").remove("li[title!=菠萝]") # 删除二个元素,没有返回删除的元素的jquery对象，返回的是$("ul li")对象
+        ```
+
+    - detach() 删除元素但是仍保留元素绑定的事件，附加数据等信息（remove不会保存这些信息）
+        ```js
+        $('ul li').click(function(){
+            alert($(this).html());
+        });
+
+        var $li = $('ul li:eq(1)').detach();
+        $li.appendTo('ul');  # 可通过chrome 的 elements的 eventlisteners来查看元素绑定了哪些事件
+
+        ```
+
+    - empty() 清空元素里的所有后代元素
+        ```js
+        $('ul li:eq(1)').empty();
+        ```
+
+5. 3.2.5 复制节点
+    ```js
+
+    $('ul li').click(function(){
+        $(this).clone().appendTo($("ul"));
+    })
+
+    $('ul li').click(function(){
+        $(this).clone(true).appendTo("ul");  # clone(true)会同时复制元素的行为
+    })
+
     ```
 
-5. 
+6. 3.2.6 替换节点
+
+    ```js
+    $('p').replaceWith("<strong>你最不喜欢的水果是?</strong>");
+
+    $("<strong>你最不喜欢的水果是?</strong>").replaceAll('p');
+    ```
+
+7. 3.2.7 包裹节点
+
+    - wrap() and wrapAll()
+        ```js
+        $("p").replaceWith("<strong>你最不喜欢的水果是?</strong>");
+        $('strong').clone().insertAfter($('strong'));
+
+
+        $("strong").wrap("<b></b>");
+
+        $("strong").wrapAll("<p></p>");  # 当这些 strong 元素不是连续的元素时，wrapAll会出现一些问题
+        ```
+
+    - wrapInner()
+        ```js
+        $('strong').wrapInner("<b></b>");
+        ```
+
+8. 3.2.8 属性操作
+
+    - attr() 获取和设置属性
+        ```js
+        $("p").attr("title"); # 获取属性
+
+        $("p").attr("title", "your title"); # 设置属性
+
+        $("p").attr({"title":"your title", "name":"your name"}); # 同时设置多个属性
+        ```
+
+    - removeAttr() 删除属性
+    ```js
+    $("p").removeAttr("title");
+    ```
+
+9. 3.2.9 样式操作（通过添加减少替换class来操作）
+
+    - 获取样式和设置样式
+        ```js
+        $("p").addClass("myClass"); # 追加样式
+
+        $("p").attr("class");
+
+        $("p").attr("class", "high");  # 使用high替换原myClass
+        ```
+
+    -  移除样式
+        ```js
+
+        $("p").removeClass("myClass");
+
+        $("p").removeClass("high").removeClass("another");  # 链式操作
+
+        $("p").removeClass("high another");  # 空格隔开多值
+
+        $("p").removeClass();  # 注意：移除所有class
+
+        ```
+
+    - 切换样式
+        ```js
+        $("p").toggleClass("myclass");  # 追加和移除myclass
+
+        ```
+
+    - 判断是都含有某个样式
+        ```js
+        $("p").toggleClass("myclass");
+        $("p").hasClass('myclass');
+        $("p").toggleClass("myclass");
+        ```
+
+10. 3.2.10 设置和获取HTML、文本和值
+
+    - html()方法
+        ```js
+        var p_html = $("p").html();
+        alert(p_html);
+
+        $("p").html("New Html content <strong>也可以是代码偶！</strong>")
+        ```
+
+    - text()方法
+        ```js
+        var p_text = $('p').text();
+        alert(p_text);
+        $("p").text("New Html content <strong>html代码不会被翻译！</strong>");
+        ```
+
+    - val()方法: 获取设置表单值（包括select，checkbox的选项被选中）
+        ```js
+        // 获得焦点
+        $("#address").focus(function(){
+            var text_value = $(this).val();
+            if (text_value == "请输入邮箱地址"){
+                $(this).val("");
+            }
+        })
+        // this.defaultValue
+        $("#address").focus(function(){
+            var text_value = $(this).val();
+            if (text_value == this.defaulValue){
+                $(this).val("");
+            }
+        })
+
+        // 失去焦点
+        $("#address").blur(function(){
+            var text_value = $(this).val();
+            if (text_value == ""){
+                $(this).val("请输入邮箱地址");
+            }
+        })
+
+        // 设置选项被选中
+        $("#single").val("选择2号");
+        $("#multiple").val(["选择2号", "选择3号"]);
+
+        $(":checkbox").val(["check1", "check2"]);
+        $(":radio").val(["radio2"]);
+
+        // 同等方法
+        $("#single option:eq(1)").attr("selected", true);
+        $("#single option:eq(2)").attr("selected", "selected");
+
+        $("[value=radio2]:radio").attr("checked", true);
+        $("[value=radio3]").attr("checked", true);
+        ```
+
+
+11. 3.2.11 遍历节点
+
+    - children()方法
+        ```js
+        $("body").children().length;
+
+        var option_list = $("#multiple").children();
+        $("#multiple").children()[0];
+        // <option selected="selected">选择1号</option>
+
+        for (i=0;i<option_list.length;i++){
+            console.log(option_list[i].innerHTML);  # 这里的option_list[i]为什么不能使用html()等jquery方法？
+        }
+        ```
+
+    - next()方法
+        ```js
+        获取紧邻匹配到的元素后的同辈元素
+        ```
+
+
+    - prev()方法
+        ```js
+        获取紧邻匹配到的元素前的同辈元素
+        ```
+
+    - siblings()方法
+        ```js
+        获取紧邻匹配到的元素前后的所有同辈元素
+        $("#multiple option:contains(2)").siblings().length;
+        ```
+
+    - closest()
+        ```js
+        $(document).bind("click", function(e){
+            $(e.target).closest("li").css("color", "red");
+        })
+
+        ```
+
+    - parent(), parents()与closest()的区别
+        ```js
+        parent()   一级父元素
+        parents()  多级父元素
+        ```
+
+
+12. 3.2.12 CSS_DOM 操作：
+
+    > 读取和设置style对象的各种属性  
+    > 注意css中那些带-的样式，使用时需要转换成小驼峰格式：
+    > font-size fontSize; background-color  backgroundColor
+
+    -  css()获取得是样式
+        ```js
+        $("p").css("color");
+
+        $("p").css("color", "red");
+
+        $("p").css({"color":"red", "fontSize":"30px"});
+
+        $("p").css("height"); # 获取到的样式，可能会出现auto
+
+        ```
+
+    - 获取实际宽高方法
+        ```js
+        $("p").height(); # 获取到的是实际高度 XX 像素;
+        $("p").width();
+        ```
+
+    - offset() 当前视窗的相对偏移
+        ```js
+        var position = $("p").offset();  # 对象包含两个属性，top和left，左上角是（0，0），当前位置（top， left）
+        var left = position.left;
+        var top = position.top;
+        ```
+
+    - position()方法 获取的是与最近的一个设置了relative或者absolute的祖父节点元素的相对偏移
+        ```js
+        var position = $("p").position();
+        var left = position.left;
+        var top = position.top;
+        ```
+
+    - scrollTop() 和 scrollLeft() 有问题
+        ```js
+        $("ul").after($("<textarea></textarea>"));
+        $("textarea").scrollTop(300);
+        $("textarea").scrollLeft(300);
+        ```
+
+
+
+#### Chapter 4：
+
+0. 4.1.1 加载DOM
+
+    ```js
+    # DOM 树准备就绪后就执行
+    # 同一个页面可以使用多次
+    # 这个函数直接放到console上是不能执行的应为，DOM加载事件已经完成不会再次触发
+    $(document).ready(function(){
+        alert("DOM 树准备就绪");
+    })
+    // 简写方式
+    $(function(){
+        alert("DOM 树准备就绪");
+    });
+
+    # load 方法可以限制对象（窗口，文档，单个元素，图片）完全加载完毕后，触发
+    $(window).load(function(){
+        alert("Load completely!");
+    })
+    // 等价js原生写法，同一个页面只可以使1次
+    window.onload = function(){
+        alert("Load completely!");   
+    }
+
+    ```
+
+1. 4.1.2 事件绑定
+
+    > bind(enven_type [, data], fn)   
+    > blur focus load resize scroll unload click dbclick mousedown mouseup mousemove mouseover mouseout  
+    > 同一元素可以绑定多个事件
+
+
+    - 基本效果
+        ```js
+        $(document).ready(function(){
+            $("#panel h5.head").bind("click", function(){
+                $(this).next().show();
+            });
+        });
+
+        ```
+
+    - 加强效果
+        ```js
+
+        $(document).ready(function(){
+            $("#panel h5.head").bind("click", function(){
+                var $content = $(this).next();
+                if ($content.is(":visible")){
+                    $content.hide();
+                } else {
+                    $content.show();
+                }
+                
+            });
+        });
+
+        ```
+
+    - 改变绑定事件的类型
+        ```js
+        $(document).ready(function(){
+            $("#panel h5.head").bind("mouseover", function(){
+                $(this).next().show();      
+            }).bind("mouseout", function(){
+               $(this).next().hide(); 
+            });
+        });
+        ```
+
+    - 简写绑定事件
+        ```js
+        $(document).ready(function(){
+            $("#panel h5.head").mouseover(function(){
+                $(this).next().show();      
+            }).mouseout(function(){
+               $(this).next().hide(); 
+            });
+        });
+        ```
+
+2. 4.1.3 合成事件
+
+    - hover(fn_enter,fn_leave) 鼠标一定悬停与取消
+        ```js
+        $("#panel h5.head").hover(function(){
+            $(this).next().show();
+        }, function(){
+            $(this).next().hide();
+        });
+
+        ```
+
+    - toggle(fn_enter,fn_leave) 单击切换
+        ```js
+        $("#panel h5.head").toggle(function(){
+            $(this).next().show();
+        }, function(){
+            $(this).next().hide();
+        });
+
+        $("#panel h5.head").toggle(function(){
+            $(this).next().toggle(); // 还可以直接切换元素的显示与否
+        }, function(){
+            $(this).next().toggle();
+        });
+
+        ```
+
+    - 先写样式，后分配给元素的class
+        ```js
+
+        $("#panel h5.head").toggle(function(){
+            $(this).next().addClass('highlight'); // 还可以直接切换元素的显示与否
+            $("#panel h5.head").next().show();
+        }, function(){
+            $(this).next().removeClass('highlight');
+            $("#panel h5.head").next().hide();
+        });
+
+        ```
+
+
+3. 4.1.4 时间冒泡
+
 
 
 

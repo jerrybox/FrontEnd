@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sharp Jquery</title>
+    <script src="jquery.min.js"></script>
+    <style type="text/css">
+        #panel {
+            width:300px;
+        }
+        h5.head {
+            background-color: #bbffaa;
+            border: solid 1px black;
+            margin-bottom: 0px;
+        }
+        div.content {
+            border: solid 1px black;
+            margin-top: 0px;
+            display: none;
+        }
+        .highlight {
+            background: #FF3300;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="panel">
+    <h5 class="head">什么事Jquery？</h5>
+    <div class="content">
+
+    jQuery是一个快速、简洁的JavaScript框架，是继Prototype之后又一个优秀的JavaScript代码库（或JavaScript框架）。jQuery设计的宗旨是“write Less，Do More”，即倡导写更少的代码，做更多的事情。它封装JavaScript常用的功能代码，提供一种简便的JavaScript设计模式，优化HTML文档操作、事件处理、动画设计和Ajax交互。
+
+    </div>
+    <div>Why Am I Up, Why Am I Down?</div>
+    
+</div>
+
+<script>
+
+        $("#panel h5.head").toggle(function(){
+            $(this).next().addClass('highlight'); // 还可以直接切换元素的显示与否
+            $("#panel h5.head").next().show();
+        }, function(){
+            $(this).next().removeClass('highlight');
+            $("#panel h5.head").next().hide();
+        });
+
+</script>
+
+</body>
+</html>
