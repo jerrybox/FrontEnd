@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sharp Jquery</title>
+    <script src="jquery.min.js"></script>
+    <style type="text/css">
+
+    </style>
+    <script>
+        $(function(){
+            $("span").bind("click", function(event){
+                var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
+                $("#msg").html(txt);
+                event.stopPropagation();
+            });
+
+            $("#content").bind("click", function(){
+                var txt = $("#msg").html() + "<span>2 外层的的div元素被点击</span><br/>";
+                $("#msg").html(txt);
+            });
+
+            $("body").bind("click", function(){
+                var txt = $("#msg").html() + "<span>3 外层的的body元素被点击</span><br/>";
+                $("#msg").html(txt);
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+
+<div id="content">
+    外层的div元素<br>
+    <span>内层span元素</span><br>
+    外层的div元素<br>
+</div>
+
+<div id="msg"></div>
+
+
+</body>
+</html>

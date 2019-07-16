@@ -1,4 +1,5 @@
-### 编码习惯
+## 编码习惯
+-----------
 
 0. 变量名区分：
 
@@ -35,25 +36,22 @@
 2. 函数的参数可以是一个函数定义语句，而不必须是一个变量（与Python不同）：
 
     - 参数是一个匿名函数：
-    ```js
+        ```js
+        $('ul li').click(
+            function(){
+                alert($(this).html());
+            }
+        );
 
-    $(document).ready(
+        ```
 
-    function(){
-        alert("Hello World!");
-    }
-
-    );
-
-
-    $('ul li').click(
-
-    function(){
-        alert($(this).html());
-    }
-
-    );
-
+    - 参数是一个赋值语句
+        ```js
+        $(function(){
+            $("#btn").bind("click", myFun1=function(){$('#test').append("<p>我的绑定函数1</p>")})
+                     .bind("click", myFun2=function(){$('#test').append("<p>我的绑定函数1</p>")})
+                     .bind("click", myFun3=function(){$('#test').append("<p>我的绑定函数1</p>")});
+        });
     ```
 
 3. 元素集合，通过下标索引获取。就会变成DOM对象
@@ -77,8 +75,8 @@
     |  2  |   onclick  | click |
 
 
-### Sharp Jquery 
-
+## Sharp Jquery 
+---------------
 
 0. DOM对象与Jquery对象互相转化
 
@@ -106,16 +104,15 @@
 
         ```
 
-    - 当返回多个对象时，但后面跟了一个只能处理一个对象的方法时也不会报错，有的默认返回第一，有的会其他处理方式
+    - 当返回多个对象时，但后面跟了一个只能处理一个对象的方法时也不会报错，有的默认返回第一，有的会其他处理方式   
         ```js
-        $("div:contains(di)").css("background", "#bbffaa").length
+        $("div:contains(di)").css("background", "#bbffaa").length;
         // 5
         $("div:contains(di)").css("background", "#bbffaa").html();  # 返回了第一个元素的div#one.one的内容
         /*
         id 为one，class为one的div
         <div class="mini">class为mini</div>
         */
-
         $("select :selected").text(); # 这个显示出了三个input的三个文本，三个文本一行显示
         // 湖南天津北京
         $("select :selected").html()
@@ -179,8 +176,8 @@
 
 
 
-#### Chapter 2 基本选择器
-
+### Chapter 2 基本选择器
+-----------------------
 
 0. 2.3.1 基本选择器
 
@@ -398,6 +395,7 @@
 
 
 ### Chapter 3 DOM操作
+---------------------
 
     DOM操作分3个方面： DOM Core，HTML-DOM和CSS-DOM
 
@@ -752,7 +750,10 @@
 
 
 
-#### Chapter 4：
+### Chapter 4：
+---------------
+
+#### 4.1 Jquery 事件
 
 0. 4.1.1 加载DOM
 
@@ -877,7 +878,185 @@
         ```
 
 
-3. 4.1.4 时间冒泡
+3. 4.1.4 事件冒泡
+
+    > 事件会按照DOM的层次结构向水泡一样不断向上直至顶端
+
+    - 由内向外冒泡
+    ```js
+    $(function(){
+        $("span").bind("click", function(){
+            var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
+            $("#msg").html(txt);
+        });
+
+        $("#content").bind("click", function(){
+            var txt = $("#msg").html() + "<span>2 外层的的div元素被点击</span><br/>";
+            $("#msg").html(txt);
+        });
+
+        $("body").bind("click", function(){
+            var txt = $("#msg").html() + "<span>3 外层的的body元素被点击</span><br/>";
+            $("#msg").html(txt);
+        });
+    });
+    ```
+
+    - 事件冒泡引发的问题
+        - 事件对象
+            ```js
+            // 当事件被触发时，事件对象event就会传递给函数，函数结束，事件对象就会被销毁
+            $('element_selector').bind('click', function(){
+                // ...
+
+                // 触发函数内使用：return false 可以同时阻止 事件冒泡 和 默认的触发行为
+            })
+
+            ```
+
+        - 阻止事件冒泡
+            ```js
+            $("span").bind("click", function(event){
+                var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
+                $("#msg").html(txt);
+                event.stopPropagation();
+            });
+
+            ```
+
+        - 阻止事件触发的元素的默认行为（表单提交）
+            ```js
+            // 阻止表单提交按钮被点击后自动提交的行为
+            $("#sub").bind("click", function(event){
+                var username = $("input[name=username]").val();
+                if (username==""){
+                    $("#msg").html("<p>文本框的值不能为空</p>");
+                    event.preventDefault();  
+                };
+            });
+            ```
+
+        - Jquery不支持事件捕获
+
+
+4. 4.1.5 事件对象event的属性及方法
+
+    - event.type
+    - event.preventDefault()
+    - event.stopPropagation()
+    - event.target
+        ```js
+        获取事件对象
+        ```
+    - event.relatedTarget
+    - event.pageX 和 event.pageY
+        ```js
+        当前鼠标光标的坐标：
+
+        ```
+    - event.which
+        ```js
+        获取键位，包括鼠标左中右
+
+        $("a").mousedown(function(e){
+            alert(e.which);
+        })
+
+        $("input").keyup(function(e){
+            alert(e.which);
+        })
+        ```
+
+    - event.metaKey
+
+5. 4.1.6 移除事件：
+    
+    ```js
+    $("body").unbind("click");
+
+    $(function(){
+        $("#btn").bind("click", myFun1=function(){
+            $('#test').append("<p>我的绑定函数1</p>")
+        }).bind("click", myFun2=function(){
+            $('#test').append("<p>我的绑定函数1</p>")
+        }).bind("click", myFun3=function(){
+            $('#test').append("<p>我的绑定函数1</p>")
+        })
+    });
+
+    $("#delTwo").click(function(){
+        $("#btn").unbind("click", myFun2);  # 删除其中一个事件
+    })
+
+
+    ```
+6. 4.1.7 模拟操作
+
+    ```js
+    $("#btn").trigger("click");
+    //简写成 $("#btn").click();
+
+
+    $("#btn").bind("custom_event", function(){
+        $("#test").append("<p>定义了自定义事件！</p>");
+    })
+    $("btn").reigger("custom_event"); # 自定义事件只能手动模拟触发；
+
+
+    # trigger(type[, data])
+    $("#btn").trigger(event_type, args)
+
+
+    # trigger() 方法触事件后，会执行浏览器的默认操作
+    $("input").trigger("focus"); 触发focus事件且input获得焦点
+
+    $("input").triggerHandler("focus");  仅仅触发focus事件input不会获取焦点，也就是阻止了浏览器的默认操作
+    ```
+
+7. 其他用法
+
+    - 绑定多个事件类型
+        ```js
+        $(function(){
+            $("div").bind("mouseover mouseout", function(){
+                $(this).toggleClass("over");
+            })
+        });
+
+        $(function(){
+            $("div").bind("mouseover", function(){
+                $(this).toggleClass("over");
+            }).bind("mouseout", function(){
+                $(this).toggleClass("over");
+            })
+        });
+
+        ```
+
+    - 添加事件命名空间，便于管理
+        ```js
+        $(function(){
+            $("div").bind("mouseover.namespace1", function(){
+                $(this).toggleClass("over");
+            }).bind("mouseout.namespace2", function(){
+                $(this).toggleClass("over");
+            }).bind("click.namespace1", function(){
+                $(this).toggleClass("over");
+            })
+        });
+
+        $("div").unbind("mouseover.namespace1");
+        ```
+
+    - 相同的事件名称，同时触发
+        ```js
+        $("div").trigger("click!"); # !这里的作用是，只触发不包含命名空间的click；
+
+        ```
+
+#### 4.2 Jquery 动画
+
+
 
 
 
