@@ -75,6 +75,14 @@
     |  2  |   onclick  | click |
 
 
+5. 数据绑定问题：
+
+    > 页面上的两个input实时显示鼠标或者某个元素的坐标
+
+
+
+
+
 ## Sharp Jquery 
 ---------------
 
@@ -91,6 +99,7 @@
         */
 
     $($("#one")[0]);  # $() 将dom对象括起来，就转换成了jquery对象了
+    // 与$("#one")比较，二者同样是jquery对象，也不相同
 
 
     ```
@@ -174,6 +183,19 @@
 
     ```
 
+4. 链式操作，选择器方法("selector") 内继续使用选择器进一步选择
+
+    ```js
+    # css选择器 和 jquery的这些选择器方法 选择的过程都是一层一层细化筛选的，这些选择器就是筛选 范围或条件。
+
+    find("#selector");
+
+    var $parent = $(this).parents("div.v_show");
+    $parent.find("div.v_caption .highlight_tip span").eq((page - 1)).addClass("current").siblings("span").removeClass("current");
+
+    siblings("span")  // 元素的同辈元素中的span元素， siblings() 即获取所有的同辈元素
+
+    ```
 
 
 ### Chapter 2 基本选择器
@@ -557,9 +579,9 @@
         ```
 
     - removeAttr() 删除属性
-    ```js
-    $("p").removeAttr("title");
-    ```
+        ```js
+        $("p").removeAttr("title");
+        ```
 
 9. 3.2.9 样式操作（通过添加减少替换class来操作）
 
@@ -676,7 +698,6 @@
         获取紧邻匹配到的元素后的同辈元素
         ```
 
-
     - prev()方法
         ```js
         获取紧邻匹配到的元素前的同辈元素
@@ -700,6 +721,8 @@
         ```js
         parent()   一级父元素
         parents()  多级父元素
+
+        var $parent = $(this).parents("div.v_show");
         ```
 
 
@@ -727,14 +750,14 @@
         $("p").width();
         ```
 
-    - offset() 当前视窗的相对偏移
+    - offset() 当前视窗的相对偏移【绝对位置】
         ```js
         var position = $("p").offset();  # 对象包含两个属性，top和left，左上角是（0，0），当前位置（top， left）
         var left = position.left;
         var top = position.top;
         ```
 
-    - position()方法 获取的是与最近的一个设置了relative或者absolute的祖父节点元素的相对偏移
+    - position()方法 获取的是与最近的一个设置了relative或者absolute的祖父节点元素的相对偏移【相对位置】
         ```js
         var position = $("p").position();
         var left = position.left;
@@ -883,24 +906,24 @@
     > 事件会按照DOM的层次结构向水泡一样不断向上直至顶端
 
     - 由内向外冒泡
-    ```js
-    $(function(){
-        $("span").bind("click", function(){
-            var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
-            $("#msg").html(txt);
-        });
+        ```js
+        $(function(){
+            $("span").bind("click", function(){
+                var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
+                $("#msg").html(txt);
+            });
 
-        $("#content").bind("click", function(){
-            var txt = $("#msg").html() + "<span>2 外层的的div元素被点击</span><br/>";
-            $("#msg").html(txt);
-        });
+            $("#content").bind("click", function(){
+                var txt = $("#msg").html() + "<span>2 外层的的div元素被点击</span><br/>";
+                $("#msg").html(txt);
+            });
 
-        $("body").bind("click", function(){
-            var txt = $("#msg").html() + "<span>3 外层的的body元素被点击</span><br/>";
-            $("#msg").html(txt);
+            $("body").bind("click", function(){
+                var txt = $("#msg").html() + "<span>3 外层的的body元素被点击</span><br/>";
+                $("#msg").html(txt);
+            });
         });
-    });
-    ```
+        ```
 
     - 事件冒泡引发的问题
         - 事件对象
@@ -917,6 +940,13 @@
         - 阻止事件冒泡
             ```js
             $("span").bind("click", function(event){
+                var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
+                $("#msg").html(txt);
+                event.stopPropagation();
+            });
+
+            # 绑定click事件的简写方法，其他事件绑定(下面的mouseover,focus等)都可以这样简写
+            $("span").click(function(event){
                 var txt = $("#msg").html() + "<span>1 内部的span元素被点击</span><br/>";
                 $("#msg").html(txt);
                 event.stopPropagation();
@@ -949,7 +979,7 @@
         获取事件对象
         ```
     - event.relatedTarget
-    - event.pageX 和 event.pageY
+    - event.pageX 和 event.pageY  位置与事件相关
         ```js
         当前鼠标光标的坐标：
 
@@ -1000,7 +1030,7 @@
     $("#btn").bind("custom_event", function(){
         $("#test").append("<p>定义了自定义事件！</p>");
     })
-    $("btn").reigger("custom_event"); # 自定义事件只能手动模拟触发；
+    $("btn").trigger("custom_event"); # 自定义事件只能手动模拟触发；
 
 
     # trigger(type[, data])
@@ -1055,6 +1085,296 @@
         ```
 
 #### 4.2 Jquery 动画
+
+
+1. show() 和 hide()
+
+    - 不带参数
+        ```js
+        // 等同于如下代码
+        .css("display", "none/block/inline")
+        ```
+
+    - 可选的参数
+        ```js
+        $("element").show(1000); # 数字单位是毫秒
+        $("element").hide(1000); # 数字单位是毫秒
+
+        $("element").show("slow"); # 数字单位是毫秒
+        $("element").hide("normal"); # 数字单位是毫秒
+        ```
+
+2. fadeIn() 和fadeOut()
+    
+    通过改变不透明度显示隐藏元素,直至diplay：none
+
+
+3. slideUp() 和 slideDown()
+
+    - slideUp()    （窗帘）上拉，由下到上缩短隐藏 ,直至diplay：none
+    - slideDown()  （窗帘）下拉，由上之下延伸展示
+
+4. animate() 自定义动画--较复杂
+
+    > 格式：  animate(params, speed, callback) 
+    > params:包含样式属性及值的映射 {"property1": "value1", "property2": "value2"}   
+    > 可选参数，速度  
+    > 可选参数，动画完成时执行的函数  
+    > 注意为了能影响该元素的top left bottom right 样式属性，需要把元素的relative设置成relative
+    > 这里的top left bottom的值是什么值？相对位置or绝对位置？怎样制定数值类型？
+
+    - 好像执行了一次，再次点击就不动了,不能连续点击
+        ```js
+        // left的这个值500px到底是什么意思呢？
+        $(function(){
+            $("#panel").click(function(){
+                $(this).animate({"left":"500px"}, 3000);
+            })
+        });
+        ```
+
+    - 累加、累减动画,单个动画（多个animate函数时，不会累计加减）
+        ```js
+        $(function(){
+            $("#panel").click(function(event){
+                $(this).animate({"left":"+=500px"}, 300);
+                console.log("left:" + event.pageX);
+                console.log("top:" + event.pageY);
+            })
+        });
+
+        // 为什么这里是可以连续点击的
+        // 累加累减的计算方法？？
+        $("#panel").click(function(){
+
+            function update(){
+                $("#coordinate input:eq(0)").val($("#panel").position().left);
+                $("#coordinate input:eq(1)").val($("#panel").position().top);
+                $("#coordinate input:eq(2)").val($("#panel").offset().left);
+                $("#coordinate input:eq(3)").val($("#panel").offset().top); 
+            }
+
+            update();
+            $(this).animate({"left":"500px"}, 3000, update)
+                   .animate({"top":"500px"}, 3000, update)
+                   .animate({"left":"-=400px"}, 3000, update)
+                   .animate({"top":"-=400px"}, 3000, update);
+        })
+        ```
+
+    - 多重动画
+        ```js
+        $("#myImg").click(function(){
+            $(this).animate({"left":"500px", "height":"200px"}, 3000);
+        })
+        ```
+
+    - 按顺序执行多个动画
+        ```js
+        $("#myImg").click(function(){
+            $(this).animate({"left":"500px"}, 3000)
+                   .animate({"height":"200px"}, 3000);
+        })
+
+        // 为什么这里是可以连续点击的
+        $("#panel").click(function(){
+            $(this).animate({"left":"500px"}, 3000)
+                   .animate({"top":"500px"}, 3000)
+                   .animate({"left":"-=500px"}, 3000)
+                   .animate({"top":"-=500px"}, 3000);
+        })
+        ```
+
+    - 综合动画
+        ```js
+        $(function(){
+            $("#panel").css("opacity", "0.5");
+            $("#panel").click(function(){
+                $(this).animate({"left":"400px","height":"200px","opacity":"1"}, 3000)
+                       .animate({"top":"200px", "width":"200px"}, 3000)
+                       .fadeOut("slow");
+            })
+        })
+        ```
+
+5. 4.2.5 动画回调函数
+
+    - css方法并不会被加入到动画队列中
+        ```js
+        $(function(){
+            $("#panel").css("opacity", "0.5");
+            $("#panel").click(function(){
+                $(this).animate({"left":"400px","height":"200px","opacity":"1"}, 3000)
+                       .animate({"top":"200px", "width":"200px"}, 3000)
+                       .css("border", "5px solid blue");  # 样式改变在click事件开始时就执行了
+            })
+        })
+
+        ```
+
+    - 想要在动画结束时完成样式调整需要使用回调函数
+        ```js
+        $(function(){
+            $("#panel").css("opacity", "0.5");
+            $("#panel").click(function(){
+                $(this).animate({"left":"400px","height":"200px","opacity":"1"}, 3000)
+                       .animate({"top":"200px", "width":"200px"}, 3000, function(){
+                            $(this).css({"border":"5px solid blue"})
+                       });
+            });
+        })
+
+        ```
+
+6. 4.2.6 停止动画和判断是否处于动画状态
+
+
+    - 停止元素的动画
+        ```js
+        stop([,ClearQueue], [,gotoEnd])
+        // ClearQueue: 可选参数，需要清空的未完成的动画队列
+        // gotoEnd:  可选参数，是否将正在执行的动画跳转到末状态
+        // stop()
+
+        $("#panel").unbind("click");
+
+
+        // 这里非常有意思，多次移入移除鼠标，事件动画会自动排序，依次执行,后面会讲到这个bug(动画队列的原因)
+        $("#panel").hover(function(){
+            $(this).animate({"left":"150"}, 10000);
+        },function(){
+            $(this).animate({"left":"8"}, 10000);
+        })
+
+
+        // 书鼠标移出时，立即结束当前动画,多次尝试移入移除，动画会立即切换左右移动方向
+        $("#panel").hover(function(){
+            $(this).stop().animate({"left":"150"}, 10000);
+        },function(){
+            $(this).stop().animate({"left":"8"}, 10000);
+        })
+
+
+        // 书鼠标移出时，没有参数的stop()只能立即结束当前动画,所以它会首先下移，而不是执行鼠标移出动画，左移
+        $("#panel").hover(function(){
+            $(this).stop().animate({"left":"150"}, 10000)
+                          .animate({"top":"150"}, 10000);
+        },function(){
+            $(this).stop().animate({"left":"8"}, 10000);
+        })
+
+
+        // 书鼠标移出时，没有参数的stop(true)只能立即结束当前事件的所有动画,所以立即执行鼠标移出动画左移
+        $("#panel").hover(function(){
+            $(this).stop(true).animate({"left":"150"}, 10000)
+                          .animate({"top":"150"}, 10000);
+        },function(){
+            $(this).stop().animate({"left":"8"}, 10000);
+        })
+        ```
+
+    - 判断元素是否处于动画状态
+        ```js
+        if (! $('#element')).is(":animated"){
+                    // do-something
+        }
+        ```
+    - 延迟动画
+        ```js
+        $(this).animate({left:"400px", height:"200px", opacity:"1"}, 3000)
+        .delay(1000)
+        .animate({top:"200px", width:"200px"}, 3000)
+        .delay(2000)
+        .fadeOut("slow");
+        ```
+
+7. 动画方法概括：
+    
+    - 下面的动画内部实质上都调用了animate()：
+
+        - hide()
+
+        - show()
+
+        - fadeIn()
+
+        - fadeOut()
+
+        - toggle()
+
+        - slideToggle()
+
+        - fadeTo()
+
+        - fadeToggle()
+
+        - animate()
+        
+
+    - 动画队列：
+
+        - 一组元素上的动画效果：
+
+        - 多组元素上的动画效果：
+
+
+    - 实例：P134case.html的css，js都非常值得学习
+        ```js
+        # javascript的动画和、CSS密不可分
+
+        $(document).ready(function(){
+            var page = 1;
+            var i = 4; 
+            $("span.next").click(function(){
+                var $parent = $(this).parents("div.v_show"); // 多级父元素,中选择div class为v_show的元素集
+                var $v_show = $parent.find("div.v_content_list");
+                var $v_content = $parent.find("div.v_content");
+
+                var v_width = $v_content.width();
+                var len = $v_content.find("li").length;
+                var page_count = Math.ceil(len / i);
+
+                if (! $v_show.is(":animated")){
+                    if (page == page_count){
+                        $v_show.animate({left: '0px'}, "slow");
+                        page = 1;
+                    } else {
+                        $v_show.animate({left: '-=' + v_width}, "normal");
+                        // $v_content.animate({left: '-=' + v_width}, "normal");   不是v_content的动画，试试有什么区别
+                        page += 1;
+                    }
+                    // $parent.find("div.v_caption highlight_tip span:eq((page - 1)").addClass("current").siblings().removeClass("current");
+                    $parent.find("div.v_caption .highlight_tip span").eq((page - 1)).addClass("current").siblings("span").removeClass("current");
+                }
+               
+            });
+
+            $("span.prev").click(function(){
+                var $parent = $(this).parents("div.v_show"); // 多级父元素,中选择div class为v_show的元素集
+                var $v_show = $parent.find("div.v_content_list");
+                var $v_content = $parent.find("div.v_content");
+
+                var v_width = $v_content.width();
+                var len = $v_content.find("li").length;
+                var page_count = Math.ceil(len / i);
+
+                if (! $v_show.is(":animated")){
+                    if (page == 1){
+                        $v_show.animate({left: '-=' + (page_count - 1) * v_width}, "slow");
+                        page = page_count;
+                    } else {
+                        $v_show.animate({left: '+=' + v_width}, "normal");
+                        // $v_content.animate({left: '-=' + v_width}, "normal");   不是v_content的动画，试试有什么区别
+                        page -= 1;
+                    }
+                    // $parent.find("div.v_caption highlight_tip span:eq((page - 1)").addClass("current").siblings().removeClass("current");
+                    $parent.find("div.v_caption .highlight_tip span").eq((page - 1)).addClass("current").siblings("span").removeClass("current");
+                }
+               
+            });
+        });
+
+        ```
 
 
 

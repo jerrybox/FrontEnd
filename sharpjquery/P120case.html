@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sharp Jquery</title>
+    <script src="jquery.min.js"></script>
+    <style type="text/css">
+        #panel {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            left: 0px;
+            top: 0px;
+            border:1 px solid #0050D0;
+            background: #96E555;
+            cursor:pointer;
+        }
+    </style>
+
+    <script>
+        $(function(){
+            // $("#panel").css("opacity", "0.5");
+            // update();
+            // $("#panel").click(function(){
+            //     $(this).animate({"left":"400px","height":"200px","opacity":"1"}, 3000)
+            //            .animate({"top":"200px", "width":"200px"}, 3000, function(){
+            //                 $(this).css({"border":"5px solid blue"});
+            //                 update();
+            //            });
+
+            // });
+
+       $("#panel").hover(function(){
+            $(this).stop(true).animate({"left":"150"}, 10000)
+                          .animate({"top":"150"}, 10000);
+        },function(){
+            $(this).stop().animate({"left":"8"}, 10000);
+        })
+
+            function update(){
+                $("#coordinate input:eq(0)").val($("#panel").position().left);
+                $("#coordinate input:eq(1)").val($("#panel").position().top);
+                $("#coordinate input:eq(2)").val($("#panel").offset().left);
+                $("#coordinate input:eq(3)").val($("#panel").offset().top);
+            }
+
+
+        })
+    </script>
+</head>
+<body>
+
+
+<div id="panel">
+
+</div>
+
+<div id="coordinate">
+    <label>position-X</label><input><br>
+    <label>position-Y</label><input><br>
+    <label>offset-X</label><input><br>
+    <label>offset-Y</label><input>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
