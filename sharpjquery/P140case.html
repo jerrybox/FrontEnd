@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sharp Jquery</title>
+    <script src="jquery.min.js"></script>
+
+    <style type="text/css">
+        body{
+            font:normal 12px/17px Arial;
+        }
+        div{
+            padding:2px;
+        } 
+        input:focus, textarea:focus {
+            border:1px solid #f00;
+            background:#fcc;
+        }
+        .focus { 
+             border: 1px solid #f00;
+             background: #fcc;
+        } 
+    </style>
+        
+    <script>
+       $(document).ready(function(){
+            //这里有2点错误：
+            //1 选择器没有选择所有的输入域，select，input，textarea不具扩展性
+            //2 addClass('.focus');  增加class里面是class名称，而不是选择器表达式
+            $("#regForm input,textarea").focus(function(){
+                $(this).addClass('.focus');
+            }).blur(function(){
+                $(this).removeClass('.focus');
+            })
+
+
+           $("#regForm :input").focus(function(){
+                $(this).addClass('.focus');
+            }).blur(function(){
+                $(this).removeClass('.focus');
+            })
+
+
+
+
+            
+       })
+
+       $(document).ready(function(){
+            var $comment =  $("#comment");
+            $(".bigger").click(function(){
+                if ($comment.height() < 200){
+                    $comment.height($comment.height() + 20);
+                }
+            });
+
+            $(".smaller").click(function(){
+                if ($comment.height() > 20){
+                    $comment.animate({"height":"-=50"}, 400);
+                }
+            })
+
+        });
+    </script>
+
+</head>
+<body>
+
+<form action="#" method="POST" id="regForm">
+    <fieldset>
+        <legend>个人基本信息</legend>
+        <div>
+            <label for="username">名称：</label>
+            <input id="username" type="text">
+        </div>
+        <div>
+            <label for="password">名称：</label>
+            <input id="pass" type="password">
+        </div>
+        <div>
+            <label for="msg">名称：</label>
+            <textarea id="msg"></textarea>
+        </div>
+    </fieldset>
+</form>
+
+<br>
+<br>
+
+<form action="#" method="POST" id="regForm2">
+    <div class="msg">
+        <div class="msg_caption">
+            <span class="bigger">放大</span>
+            <span class="smaller">缩小</span>
+            <span class="up">向上</span>
+            <span class="down">向下</span>
+        </div>
+        <div>
+            <textarea id="comment" rows="8" cols="20">
+                多行文本框宽高变化 
+                多行文本框宽高变化 
+                多行文本框宽高变化 
+                多行文本框宽高变化
+                多行文本框宽高变化 
+                多行文本框宽高变化 
+                多行文本框宽高变化 
+                多行文本框宽高变化 
+            </textarea>
+        </div>
+    </div>
+</form>
+
+<br/>
+
+<form action="#" method="POST" id="regForm3">
+    你爱好的运动是？
+    <input type="checkbox" id="toggle">全选/全不选<br/>
+
+    <input type="checkbox" name="items" value="足球">足球
+    <input type="checkbox" name="items" value="篮球">篮球
+    <input type="checkbox" name="items" value="羽毛球">羽毛球
+    <input type="checkbox" name="items" value="乒乓球">乒乓球<br/>
+
+    <input type="button" id="CheckAll"  value="全选">
+    <input type="button" id="CheckNo"  value="全不选">
+    <input type="button" id="CheckedRev"  value="反选">
+    <input type="button" id="send"  value="提交">
+</form> 
+
+
+</body>
+</html>
+
+
+
+
+

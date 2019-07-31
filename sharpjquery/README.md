@@ -1,3 +1,22 @@
+
+##  三大类型元素
+
+0. 标签节点元素
+    - tag， 
+
+1. 属性节点元素
+    - class，
+    - id，
+    - checked， 
+    - type， 
+
+2. 样式节点元素 
+    - height，
+    - weight，
+    - color
+    - position
+
+
 ## 编码习惯
 -----------
 
@@ -45,14 +64,14 @@
 
         ```
 
-    - 参数是一个赋值语句
+    - 参数是一个赋值语句: 
         ```js
         $(function(){
             $("#btn").bind("click", myFun1=function(){$('#test').append("<p>我的绑定函数1</p>")})
                      .bind("click", myFun2=function(){$('#test').append("<p>我的绑定函数1</p>")})
                      .bind("click", myFun3=function(){$('#test').append("<p>我的绑定函数1</p>")});
         });
-    ```
+        ```
 
 3. 元素集合，通过下标索引获取。就会变成DOM对象
 
@@ -80,6 +99,13 @@
     > 页面上的两个input实时显示鼠标或者某个元素的坐标
 
 
+6. this 与 $(this)
+
+    ```js
+    this  // js 原生的DOM
+
+    $(this) // 转换成了jquery对象
+    ```
 
 
 
@@ -162,6 +188,20 @@
 
         ```
 
+    - 什么时候需使用each，什么时候不需要each
+        ```js
+        $("#toggle").click(function(){
+            if($(this).is(":checked")){
+                $("input[name=items]:checkbox").each(function(){      // 这里使用each遍历操作每个input
+                    $(this).attr({"checked": true});
+                })
+            } else {
+               $("input[name=items]:checkbox").attr({"checked": false});  // 这里可不用each直接操作所有的input
+            }
+
+        })
+
+        ```
 
 2. 对于class,id 属性等名称包含了 #，.，]等特殊字符时需要使用【双反斜杠】转义
 
@@ -171,7 +211,7 @@
     $("#id\\#b")
     ```
 
-3.  【难点】链式操作的返回值，取决于最后一个选择器方法的返回对象，这些纯操作函数（remove）不会影响最终返回的jquery对象
+3.  【难点】链式操作的返回值，取决于最后一个选择器方法的返回对象，这些纯操作函数（remove）不会影响最终返回的jquery对象,或者说，这些操作函数，会首先返回所操作的对象，而后执行其他操作
 
     ```js
         // remove() 会删除匹配到的元素，返回值取决于remove()函数前面作用的对象是什么，就返回什么。
@@ -187,6 +227,8 @@
 
     ```js
     # css选择器 和 jquery的这些选择器方法 选择的过程都是一层一层细化筛选的，这些选择器就是筛选 范围或条件。
+    parents()  // 很多选择器方法都可以不带参数
+    siblings()  
 
     find("#selector");
 
@@ -402,13 +444,18 @@
         // 湖南天津北京
         ```
 
+    - filter的作用 -- $变量.filter()
+        ```js
+        $("#toggle").attr({"checked": $tmp.length == $tmp.filter(":checked").length});
+        ```
+
 3. 2.3.4 表单选择器
     
     Jquery中专门加入了表单选择器    
     :input_type 根据输入框类型选择元素    
 
     ```js
-    $("#form1 :input").length;  # 选择所有的input、textarea、select、button元素
+    $("#form1 :input").length;  # 选择所有的input、textarea、select、button元素,所有输入域
 
     $("#form1 :text").length;
 
@@ -456,6 +503,12 @@
         ```js
         $("#id").attr('attr_name');
         $("#id").attr('attr_namme', 'attr_value');
+
+        // 1 对于只添加属性名称就会生效的属性
+        // 2 且这些属性只有true和false两种状态
+        // P149  应该使用prop，且返回值是标准的true或false，如：checked， selected
+        $("form input[type=checkbox]").prop("checked");
+        $("form input[type=checkbox]").prop({"checked": true})
         ```
 
 
@@ -510,6 +563,14 @@
         $li_2.appendTo("ul"); # 将删除了的这个元素追加到ul内部的最后面
 
         $("ul li").remove("li[title!=菠萝]") # 删除二个元素,没有返回删除的元素的jquery对象，返回的是$("ul li")对象
+
+        $("#add").click(function(){
+            var $options = $("#select1 option:selected");
+            // var $remove = $options.remove();  可以不需要remove，直接移动元素
+            // $remove.appendTo($("#select2"));
+            $options.appendTo($('#select2'));  # 这里直接移动了节点元素
+        })
+
         ```
 
     - detach() 删除元素但是仍保留元素绑定的事件，附加数据等信息（remove不会保存这些信息）
@@ -585,7 +646,7 @@
 
 9. 3.2.9 样式操作（通过添加减少替换class来操作）
 
-    - 获取样式和设置样式
+    - 获取样式和设置样式，
         ```js
         $("p").addClass("myClass"); # 追加样式
 
@@ -619,6 +680,19 @@
         $("p").hasClass('myclass');
         $("p").toggleClass("myclass");
         ```
+
+    - 参数是class名而不是选择器表达式
+        ```js
+        //这里有2点错误：
+        //1 选择器没有选择所有的输入域，select，input，textarea不具扩展性
+        //2 addClass('.focus');  增加class里面是class名称，而不是选择器表达式
+        $("#regForm input,textarea").focus(function(){
+            $(this).addClass('.focus');
+        }).blur(function{
+            $(this).removeClass('.focus');
+        })
+        ```
+
 
 10. 3.2.10 设置和获取HTML、文本和值
 
@@ -695,22 +769,24 @@
 
     - next()方法
         ```js
-        获取紧邻匹配到的元素后的同辈元素
+        获取紧邻匹配到的元素后的同辈元素, 接受selector参数，可以进一步过滤筛选元素
         ```
 
     - prev()方法
         ```js
-        获取紧邻匹配到的元素前的同辈元素
+        获取紧邻匹配到的元素前的同辈元素, 接受selector参数，可以进一步过滤筛选元素
         ```
 
     - siblings()方法
         ```js
-        获取紧邻匹配到的元素前后的所有同辈元素
+        获取紧邻匹配到的元素前后的所有同辈元素，接受一个selector参数，可以进一步过滤筛选元素
         $("#multiple option:contains(2)").siblings().length;
+        $("#multiple option:contains(2)").siblings("li:eq(1)").length;
         ```
 
     - closest()
         ```js
+        接受一个selector参数，可以进一步过滤筛选元素
         $(document).bind("click", function(e){
             $(e.target).closest("li").css("color", "red");
         })
@@ -719,6 +795,7 @@
 
     - parent(), parents()与closest()的区别
         ```js
+        接受一个selector参数，可以进一步过滤筛选元素
         parent()   一级父元素
         parents()  多级父元素
 
@@ -752,9 +829,9 @@
 
     - offset() 当前视窗的相对偏移【绝对位置】
         ```js
-        var position = $("p").offset();  # 对象包含两个属性，top和left，左上角是（0，0），当前位置（top， left）
-        var left = position.left;
-        var top = position.top;
+        var offset = $("p").offset();  # 对象包含两个属性，top和left，左上角是（0，0），当前位置（top， left）
+        var left = offset.left;
+        var top = offset.top;
         ```
 
     - position()方法 获取的是与最近的一个设置了relative或者absolute的祖父节点元素的相对偏移【相对位置】
@@ -1377,6 +1454,211 @@
         ```
 
 
+
+### Chapter 5 jquery 对表单、表格的操作及更多的应用
+
+1. 5.1  表单：
+
+    - 单行文本框应用
+        ```js
+        $("#regForm :input").focus(function(){
+            $(this).addClass('.focus');
+        }).blur(function{
+            $(this).removeClass('.focus');
+        })
+        ```
+
+    - 多行文本框
+        ```js
+
+        $(document).ready(function(){
+            var $comment =  $("#comment");
+            $(".bigger").click(function(){
+                if ($comment.height() < 500){
+                    $comment.height($comment.height() + 50);
+                }
+            });
+
+            $(".smaller").click(function(){
+                if (！$comment.is(":animated")){
+                    if ($comment.height() > 50){
+                        $comment.animate({"height":"-=50"}, 400);
+                    }
+                }
+
+            })
+
+            $(".up").click(function(){
+                if (！$comment.is(":animated")){
+                    $comment.animate({"scrollTop":"-=50"}, 400);
+                }
+            })
+
+            $(".down").click(function(){
+                if (！$comment.is(":animated")){
+                    $comment.animate({"scrollTop":"+=50"}, 400);
+                }
+            })
+
+
+        });
+
+        ```
+
+    - 复选框应用
+        ```js
+        $(document).ready(function(){
+            $('#CheckAll').click(function(){
+                $("input[name=items]").attr({"checked": true});
+            })
+
+            $('#CheckNo').click(function(){
+                $("input[name=items]").attr({"checked": false});
+            })
+
+            $('#CheckedRev').click(function(){
+                $("input[name=items]").each(function(){
+                    this.checked = !this.checked;  // js 原生的DOM对象
+                    // $(this).attr({"checked": !$(this).attr("checked")});   // Jquery对象$(this)
+                })
+            })
+
+            $("#send").click(function(){
+                var notice = "你选中的是：\r\n";
+                $("input[name=items]:checkbox:checked").each(function(){
+                    notice += $(this).val() + "\r\n";
+                })
+                alert(notice);
+            })
+
+            $("#toggle").click(function(){
+                if($(this).is(":checked")){
+                    $("input[name=items]:checkbox").each(function(){      // 这里使用each遍历操作每个input
+                        $(this).attr({"checked": true});
+                    })
+                } else {
+                   $("input[name=items]:checkbox").attr({"checked": false});  // 这里可不用each直接操作所有的input
+                }
+
+            })
+
+            // 利用事件冒泡，表单内任何元素被点击后，都检查一遍是否全选与全不选
+            $("#regForm3").click(function(){
+                if ($("input[name=items]:checkbox[checked]").length == $("input[name=items]").length){
+                    $("#toggle").attr({"checked": true});
+                } else {
+                    $("#toggle").attr({"checked": false});
+                }
+            })
+
+            $("#toggle").click(function(){
+                $("input[name=items]:checkbox").attr({"checked": this.checked}); // 全选与全不选
+            })
+
+
+            $("#regForm3 input[name=items]:checkbox").click(function(){
+                var flag = true;
+
+                $("#regForm3 input[name=items]:checkbox").each(function(){
+                    if (! this.checked){
+                        flag = false;
+                    }
+                })
+
+                $("#toggle").attr({"checked": flag});
+            })
+
+            // filter 根据选择器过滤出dom对象
+            $("#regForm3 input[name=items]:checkbox").click(function(){
+                var $tmp = $("#regForm3 input[name=items]:checkbox");
+
+                $("#toggle").attr({"checked": $tmp.length == $tmp.filter(":checked").length});
+            })
+
+
+        });
+
+        ```
+
+    - 下拉框应用
+        ```js
+        $("#add").click(function(){
+            var $options = $("#select1 option:selected");
+            // var $remove = $options.remove();  可以不需要remove，直接移动元素
+            // $remove.appendTo($("#select2"));
+            $options.appendTo($('#select2'));
+        })
+
+
+        $("#select1").dblclick(function(){
+            var $options = $("option:selected", this);  # 这种选择元素方法很奇特，this应该是$("#select1")
+            $options.appendTo($('#select2'));
+        })
+
+        ```
+
+    - 表单验证【经典】
+        ```js
+        $("form input.required").each(function(){
+            var $required = $("<strong class='high'>*</strong>")
+            $(this).parent().append($required);
+        })
+
+
+        $('form :input').blur(function(){
+            var $parent_div = $(this).parent();
+            $parent_div.find(".formtips").remove(); // 删除错误题型
+
+            if ($(this).is("#username")){
+                if(this.value == "" || this.value.length < 6){
+                    var error_msg =  '请输入6位以上的用户名';
+                    $parent_div.append("<span class='formtips onError'>" + error_msg +"</span>");
+                }else{
+                    var ok_msg = '输入正确。';
+                    $parent_div.append("<span class='formtips onSuccess'>" + ok_msg +"</span>");
+                }
+            }
+
+            if ($(this).is("#email")){
+                if(this.value == "" || (this.value != "" && !/.+@.+\/[a-zA-Z]{2,4}$/.test(this.value))){
+                    var error_msg =  '请输入正确的email地址';
+                    $parent_div.append("<span class='formtips onError'>" + error_msg +"</span>");
+                }else{
+                    var ok_msg = '输入正确。';
+                    $parent_div.append("<span class='formtips onSuccess'>" + ok_msg +"</span>");
+                }
+            }
+        }).keyup(function(){
+            $(this).triggerHandler("blur");  // 事件触发的应用，复用blur事件的代码
+        }).focus(function(){
+            $(this).triggerHandler("blur");
+        })
+
+
+
+        $("#send").click(function(){
+            $("form .required:input").trigger('blur');
+            var numError = $('form .onError').length;
+            if (numError){
+                return false;
+            }
+            alert("注册成功，密码已经发到你的邮箱，请查收！");
+        })
+
+        ```
+
+
+2. 5.2 表格：
+
+
+
+
+3. 5.3 其他：
+
+
+
+
+### jquery 与 ajax 的应用
 
 
 
