@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sharp Jquery</title>
+    <script src="jquery.min.js"></script>
+
+    <style type="text/css">
+       
+    </style>
+        
+    <script>
+        function Ajax(){
+            var xmlHttpReq = null;
+
+            if (window.ActiveXObject){
+                xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");  // ie浏览器对象
+            } else if (window.XMLHttpRequest){
+                xmlHttpReq = new XMLHttpRequest();  // 实例化一个XMLHttpRequest对象
+            }
+
+            xmlHttpReq.open("GET", "http://127.0.0.1:8000", true);  // 调用open方法并采用异步方式，默认是异步的， true显性设置为异步
+
+            xmlHttpReq.onreadystatechange = RequestCallBack;  // 设置回调函数
+
+            xmlHttpReq.send(null);
+
+            function RequestCallBack(){
+                if (xmlHttpReq.readyState == 4){
+                    if (xmlHttpReq.status == 200){
+                        document.getElementById('resText').innerHTML = xmlHttpReq.responseText;
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+<body>
+
+<input type="button" value="Ajax提交" onclick="Ajax();">
+<div id="resText"></div>
+
+
+</body>
+</html>
+
+
+
+
+

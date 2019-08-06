@@ -1,4 +1,19 @@
 
+## 其他：
+
+0. 图片视频等二进制文件是如何异步获取的？
+
+    - html代码直接插入到页面中后，浏览器会自动发送请求，获取图片(src指向的)的内容，而不是需要手写代码接受二进制数据并解码显示成图片
+        ```js
+
+        <img class='para' src="https:\/\/live.staticflickr.com\/65535\/48458605227_05690d28a9_m.jpg"/>
+
+        $("<img class='para'/>").attr("src", item.media.m).appendTo("#resText");
+        ```
+
+
+
+
 ##  三大类型元素
 
 0. 标签节点元素
@@ -107,6 +122,15 @@
     $(this) // 转换成了jquery对象
     ```
 
+7. 全局变量：难道所有的jquery对象都可以调用ajaxStart等这些jquery的全局变量
+    ```js  
+    $
+    $.ajax
+    $.ajaxStart
+    $("#loading").ajaxStart(function(){
+        $(this).show();
+    })
+    ```
 
 
 ## Sharp Jquery 
@@ -230,13 +254,19 @@
     parents()  // 很多选择器方法都可以不带参数
     siblings()  
 
-    find("#selector");
-
     var $parent = $(this).parents("div.v_show");
     $parent.find("div.v_caption .highlight_tip span").eq((page - 1)).addClass("current").siblings("span").removeClass("current");
 
     siblings("span")  // 元素的同辈元素中的span元素， siblings() 即获取所有的同辈元素
 
+
+    $variable.find("#selector");  # 变量代表的对象基础上进行进一步元素选择
+
+
+    $("#select1").dblclick(function(){
+        var $options = $("option:selected", this);  # 这种选择元素方法很奇特，this应该是$("#select1")
+        $options.appendTo($('#select2'));
+    })
     ```
 
 
@@ -460,6 +490,12 @@
     $("#form1 :text").length;
 
     $("#form1 :password").length;
+
+
+    $("#select1").dblclick(function(){
+        var $options = $("option:selected", this);  # 这种选择元素方法很奇特，this应该是$("#select1")
+        $options.appendTo($('#select2'));
+    })
     ```
 
 
@@ -883,7 +919,7 @@
 1. 4.1.2 事件绑定
 
     > bind(enven_type [, data], fn)   
-    > blur focus load resize scroll unload click dbclick mousedown mouseup mousemove mouseover mouseout  
+    > blur focus load resize scroll unload click dbclick mousedown mouseup mousemove mouseover mouseout  keyup
     > 同一元素可以绑定多个事件
 
 
@@ -1199,6 +1235,7 @@
     > 可选参数，动画完成时执行的函数  
     > 注意为了能影响该元素的top left bottom right 样式属性，需要把元素的relative设置成relative
     > 这里的top left bottom的值是什么值？相对位置or绝对位置？怎样制定数值类型？
+    > 
 
     - 好像执行了一次，再次点击就不动了,不能连续点击
         ```js
@@ -1605,6 +1642,7 @@
         })
 
 
+
         $('form :input').blur(function(){
             var $parent_div = $(this).parent();
             $parent_div.find(".formtips").remove(); // 删除错误题型
@@ -1629,7 +1667,7 @@
                 }
             }
         }).keyup(function(){
-            $(this).triggerHandler("blur");  // 事件触发的应用，复用blur事件的代码
+            $(this).triggerHandler("blur");  // 事件触发的应用，复用blur事件的代码 P118
         }).focus(function(){
             $(this).triggerHandler("blur");
         })
@@ -1658,7 +1696,378 @@
 
 
 
-### jquery 与 ajax 的应用
+### jquery 与 ajax 的应用 (P175)
+
+1. 6.4 原生XMLHttpRequest对象
+    
+    - Browser Ajax
+        ```js
+        function Ajax(){
+            var xmlHttpReq = null;
+
+            if (window.ActiveXObject){
+                xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");  // ie浏览器对象
+            } else if (window.XMLHttpRequest){
+                xmlHttpReq = new XMLHttpRequest();  // 实例化一个XMLHttpRequest对象
+            }
+
+            xmlHttpReq.open("GET", "test.php", true);  // 调用open方法并采用异步方式，默认是异步的， true显性设置为异步
+            
+            xmlHttpReq.onreadystatechange = RequestCallBack;  // 设置回调函数
+
+            xmlHttpReq.send(null);
+ 
+            function RequestCallBack(){
+                if (xmlHttpReq.readyState == 4){   // readyState 有4种状态：未初始化，准备发送，已发送，正在接受，完成响应
+                    if (xmlHttpReq.status == 200){
+                        document.getElementById('resText').innerHTML = xmlHttpReq.responseText;
+                    }
+                }
+            }
+        }
+
+        ```
+
+    - Python Webserver
+        ```python
+        # python 3.4
+        # http://django-practice-book.com/chapter2/section2.html
+
+        import socket
+
+        EOL1 = b'\n\n'  # TypeError: 'str' does not support the buffer interface
+        EOL2 = b'\n\r\n' 
+
+        body = "Hello Ajax!"
+        response_params = [
+        'HTTP/1.0 200 OK',
+        'Date: Sat, 10 jun 2017 01:01:01 GMT',
+        'Content-Type: text/plain; charset=utf-8',
+        'Content-Length: {}\r\n'.format(len(body)),
+        body,
+        ]
+
+        response = '\r\n'.join(response_params)
+
+        def handle_connection(conn, address):
+            request = b""  # TypeError: 'in <string>' requires string as left operand, not bytes
+            while EOL1 not in request and EOL2 not in request:
+                request += conn.recv(1024)
+            print(request)
+            conn.send(bytes(response.encode("utf-8")))  # TypeError: 'str' does not support the buffer interface
+            conn.close()
+
+        def main():
+            serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            serversocket.bind(("0.0.0.0", 8000))
+            serversocket.listen(5)
+            print("http://127.0.0.1:8000")
+            try:
+                while True:
+                    conn, address = serversocket.accept()
+                    handle_connection(conn, address)
+            finally:
+                serversocket.close()
+        ```
+
+2. 6.5 Jquery 中的Ajax
+
+    
+    - Jquery中的Ajax方法分了三层
+        - 底层： 
+            - $.ajax()
+        - 中层：
+            - load 能载入远程HTML代码并插入到DOM中
+            - $.get()
+            - $.post()
+        - 上层：
+            - $.getScript()
+            - $.getJSON()
+        - 这些方法都是全局变量，任何地方都可以使用
+
+
+    - load(url [,data] [,callback])  # load方法带有参数时，会自动使用post请求
+        ```js
+        $("#send").click(function(){
+            $("#resText").load("text.html");
+        })
+
+        url后可以追加选择器，仅仅load选择器选择到的DOM元素代码
+        $("#send").click(function(){
+            $("#resText").load("text.html .para");
+        })
+
+        load的回调函数无论ajax是否成功，只要当前请求完成，就会触发
+        $("#send").click(function(){
+            $("#resText").load("text.php", {name:"admin", password:"123456"}, function(responseText, textStatus, XMLHttpRequest){
+                //callback
+            });
+        })
+        ```
+
+    - $.get(url [, data] [, callback] [, type])
+
+        - 注意：只有数据成功返回后回调函数才会被调用，这一点与load不同
+
+        - 当返回的数据格式是html片段时
+            ```js
+            $("#send").click(function(){
+                $.get("get.php", 
+                      {"username":$("#username").val(), "passsword":$("#username").val()}, 
+                      function(data, textStatus){
+                          $("#resText").html(data);
+                      }
+               )
+            })
+            ```
+        - 当返回的数据格式是XML格式数据时,XML格式的代码可以向对HTML一样通过jquery方法，css选择器进行操作(提取,删，改)
+            ```js
+            $("#send").click(function(){
+                $.get("get.php", 
+                      {"username":$("#username").val(), "passsword":$("#username").val()}, 
+                      function(data, textStatus){
+                          var username = $(data).find("comment").attr("usernmae");
+                          var content = $(data).find("comment  content").text();
+                          var txthtml = "<div class='comment'><h6>" 
+                                        + username + ":</h6><p class='para'>"
+                                        + content + "</p></div>";
+                          $("#resText").html(txthtml);
+                      }
+                )
+            })
+            ```
+        - 当返回的数据格式是JSON格式数据时
+            ```js
+            $("#send").click(function(){
+                $.get("get.php", 
+                      {"username":$("#username").val(), "passsword":$("#username").val()}, 
+                      function(data, textStatus){
+                          var username = data.username;
+                          var content = data.content;
+                          var txthtml = "<div class='comment'><h6>" 
+                                        + username + ":</h6><p class='para'>"
+                                        + content + "</p></div>";
+                          $("#resText").html(txthtml);
+                      },
+                      "json"
+                )；
+            })
+            ```
+
+    - $.post(url [, data] [, callback] [, type])
+        ```js
+
+        $("#send").click(function(){
+            $.post("get.php", 
+                  {"username":$("#username").val(), "passsword":$("#username").val()}, 
+                  function(data, textStatus){
+                      $("#resText").html(data);
+                  }
+           )
+        })
+
+        ```
+
+    - 动态加载脚本$getScript()  和 $.getJSON() 
+        ```js
+        $(document.creatElement("script")).attr("src", "test.js").appendTo("head");
+        $("<script type='text/javascript' src='test.js'></script>").appendTo("head");
+        $(function(){
+            $("send").click(function(){
+                $.getScript("test.js", function(){
+                    $("#go").click(function(){
+                        $(".block").animate({"backgroundColor": 'pink'}, 1000);
+                                   .animate({"backgroundColor": 'blue'}, 1000);
+                    })
+                });
+            })
+        })
+
+        // $.each() 不同于 $("p").each(function(){})
+        $(function(){
+            $("send").click(function(){
+                $.getJSON("test.js", function(data){
+                   // data:返回的数据
+                   $('#resText').empty();
+                   var html = ' ';
+                   $.each(data, function(commentIndex, comment){
+                        html += "<div class='comment'><h6>"
+                             + comment['username'] + ":</h6><p class='para'>"
+                             + comment['content'] + '</p></div>';
+                   })
+                   $('resText').html(html);
+                });
+            })
+        })
+
+        // JSONP跨域访问资源,不理解JSONP什么意思？
+        
+        $(function(){
+            $("#send").click(function(){
+                $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?tags=car&tagmode=any&format=json&jsoncallback=?",function(data){
+                    $.each(data.items, function(i, item){
+                        $("<img class='para'/>").attr("src", item.media.m).appendTo("#resText");
+                        if (i==3){return false; };  // 返回false即可 退出$.each函数
+                    })
+                })
+            })
+        })
+
+
+        // http://api.flickr.com/services/feeds/photos_public.gne?tags=car&tagmode=any&format=json&jsoncallback=? 需要翻墙访问
+        ({
+        "title": "Recent Uploads tagged car",
+        "link": "https:\/\/www.flickr.com\/photos\/tags\/car\/",
+        "description": "",
+        "modified": "2019-08-05T00:31:47Z",
+        "generator": "https:\/\/www.flickr.com",
+        "items": [
+            {
+                "title": "1959 Superior-Pontiac Combination",
+                "link": "https:\/\/www.flickr.com\/photos\/autohistorian\/48458605227\/",
+                "media": {"m":"https:\/\/live.staticflickr.com\/65535\/48458605227_05690d28a9_m.jpg"},
+                "date_taken": "2019-08-04T17:25:28-08:00",
+                "description": " <p><a href=\"https:\/\/www.flickr.com\/people\/autohistorian\/\">aldenjewell<\/a> posted a photo:<\/p> <p><a href=\"https:\/\/www.flickr.com\/photos\/autohistorian\/48458605227\/\" title=\"1959 Superior-Pontiac Combination\"><img src=\"https:\/\/live.staticflickr.com\/65535\/48458605227_05690d28a9_m.jpg\" width=\"240\" height=\"160\" alt=\"1959 Superior-Pontiac Combination\" \/><\/a><\/p> <p>Combination Ambulance-Funeral Car body by Superior Coach Corporation of Lima, Ohio on Pontiac chassis.<\/p>",
+                "published": "2019-08-05T00:31:47Z",
+                "author": "nobody@flickr.com (\"aldenjewell\")",
+                "author_id": "31411679@N08",
+                "tags": "1959 superior pontiac combination ambulance hearse funeral car professional vehicle postcard"
+            },
+            {
+                    "title": " ONEPLUS A5010 F1.7 4.1 mm : Dilapidated, 1996, Classic, M424 YOT, Blue, Car, Pondtail, Reliant Robin_4",
+                    "link": "https:\/\/www.flickr.com\/photos\/mpbishop\/48458445941\/",
+                    "media": {"m":"https:\/\/live.staticflickr.com\/65535\/48458445941_eb83883191_m.jpg"},
+                    "date_taken": "2019-07-31T16:27:03-08:00",
+                    "description": " <p><a href=\"https:\/\/www.flickr.com\/people\/mpbishop\/\">Nomadic Mark<\/a> posted a photo:<\/p> <p><a href=\"https:\/\/www.flickr.com\/photos\/mpbishop\/48458445941\/\" title=\" ONEPLUS A5010 F1.7 4.1 mm : Dilapidated, 1996, Classic, M424 YOT, Blue, Car, Pondtail, Reliant Robin_4\"><img src=\"https:\/\/live.staticflickr.com\/65535\/48458445941_eb83883191_m.jpg\" width=\"240\" height=\"180\" alt=\" ONEPLUS A5010 F1.7 4.1 mm : Dilapidated, 1996, Classic, M424 YOT, Blue, Car, Pondtail, Reliant Robin_4\" \/><\/a><\/p> ",
+                    "published": "2019-08-05T00:32:04Z",
+                    "author": "nobody@flickr.com (\"Nomadic Mark\")",
+                    "author_id": "47212881@N00",
+                    "tags": "1996 classic m424yot dilapidated car pondtail oneplus5t reliantrobin blue"
+            },
+        })
+        ```
+
+    - $.ajax(options)方法： 
+        ```js
+        # jquery最底层的Ajax实现
+        # 前面的$.load(), $.get(), $.post(),$.getJSON等都是基于此方法构建的
+        # 只有一个options参数：{key:value, key2:value}
+        # 四种回调函数：beforeSend， complete， success， error
+
+        $(document).ready(function(){
+            $("#send").click(function(){
+                $.ajax({
+                    "type":"GET",
+                    "url":"test.js",
+                    "dataType":"script"
+                })
+            })
+        })
+
+
+        $(document).ready(function(){
+            $("#send").click(function(){
+                $.ajax({
+                    "type":"GET",
+                    "url":"test.json",
+                    "dataType":"json"
+                    "success":function(data){
+                        $("#resText").empty();
+                        var html = '':
+                        $.each(data,function(commentIndex, comment){
+                             html += "<div class='comment'><h6>"
+                                  + comment['username'] + ":</h6><p class='para'>"
+                                  + comment['content'] + '</p></div>';
+                        })
+                        $("#resText").html(html);
+                    }
+                })
+            })
+        })
+        ```
+
+    - 注意：
+        - encodeURIComponent() 字符编码
+
+3. 6.6 序列化元素
+
+    - serialize()方法: 自动读取form里面所有input，自动编码中文字符
+        ```js
+        $("#send").click(function(){
+            $.get("test.php", $("#form1").serialize(), function(data, textStatus){
+                $("#resText").html(data);
+            })
+        })
+
+        ```
+    -  serializeArray()
+        ```js
+        var fields = $(":checkbox, :radio").serializeArray();
+        console.log(fileds);
+
+        $.each(fileds, function(i,field){
+            $("#result").append(field.value + ",")
+        })
+
+        ```
+
+    - 列表序列化
+        ```js
+        var goods_id_list = [];
+        $.ajax({
+            url: dir_href,
+            type: 'POST',
+            data: JSON.stringify({'goods_id': goods_id_list}), // ajax传输复杂结构数据需要转化成字符串
+            dataType: 'json',
+            contentType:'application/json',
+            headers: {'X-CSRFToken': csrf},
+            success:function (data) {
+                if (data.code == '200'){
+                    window.location.replace(dir_href);
+                    console.log(data);
+                }
+                total_price();
+                console.log(data);
+            },
+            error:function (data) {
+                console.log(data)
+            }
+        })
+        // goods_id_list = json.loads(request.body.decode('utf-8')).get('goods_id', []) # Django后端POST没数据，要通过body获取数据
+        ```
+
+
+4. jQuery 中的Ajax全局事件：
+
+    - Ajax请求开始时，会触发ajaxStart()
+    - Ajax请求结束时，会触发ajaxStop()
+    - 这些方法都是全局的方法，无论代码位于何处，只要有Ajax请求发生机会触发他们
+        ```js
+        <div id="loading">加载中</div>
+
+        $("#loading").ajaxStart(function(){
+            $("#loading").show();
+        })
+
+        $("#loading").ajaxStop(function(){
+            $(this).hide();
+        })
+        ```
+        
+    - 疑问：ajaxStop这些方法为什么会写在选择器的后面不应该是：$.ajaxStart()吗？
+        - ajaxError(callback)
+        - ajaxSend(callback)
+        - ajaxSuccess(callback)
+        - ajaxComplete(callback)
+
+
+
+
+
+
+
+
 
 
 
