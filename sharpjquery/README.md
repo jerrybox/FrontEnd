@@ -11,7 +11,14 @@
         $("<img class='para'/>").attr("src", item.media.m).appendTo("#resText");
         ```
 
+1. 获取当前路径
 
+```js
+var pathname = window.location.pathname; // Returns path only (/path/example.html)
+var url      = window.location.href;     // Returns full URL (https://example.com/path/example.html)
+var origin   = window.location.origin;   // Returns base URL (https://example.com)
+
+```
 
 
 ##  三大类型元素
@@ -79,7 +86,7 @@
 
         ```
 
-    - 参数是一个赋值语句: 
+    - 参数是一个赋值语句（不同于python的关键字参数，关键字参数，形参预定义）: 
         ```js
         $(function(){
             $("#btn").bind("click", myFun1=function(){$('#test').append("<p>我的绑定函数1</p>")})
@@ -106,7 +113,7 @@
     |  num  |   js  | jquery |
     |-------|-------|--------|
     |  1  |   onload  | load |
-    |  2  |   onclick  | click |
+    |  2  |   onclick | click|
 
 
 5. 数据绑定问题：
@@ -1950,7 +1957,7 @@
 
     - $.ajax(options)方法： 
         ```js
-        # jquery最底层的Ajax实现
+        # jquery最底层的Ajax实现,详细参数见P349
         # 前面的$.load(), $.get(), $.post(),$.getJSON等都是基于此方法构建的
         # 只有一个options参数：{key:value, key2:value}
         # 四种回调函数：beforeSend， complete， success， error
@@ -2001,6 +2008,7 @@
         })
 
         ```
+ 
     -  serializeArray()
         ```js
         var fields = $(":checkbox, :radio").serializeArray();
@@ -2035,6 +2043,10 @@
             }
         })
         // goods_id_list = json.loads(request.body.decode('utf-8')).get('goods_id', []) # Django后端POST没数据，要通过body获取数据
+        // POST 请求的两种数据格式：
+        // 1  FormData和Payload是浏览器传输给接口的两种格式，这两种方式浏览器是通过Content-Type来进行区分的(了解Content-Type)，
+        // 2  如果是 application/x-www-form-urlencoded的话，则为formdata方式，如果是application/json或multipart/form-data的话，则为 request payload的方式
+        // 3  payload方式的数据，是不能被django 抽取到 request.POST 里面的
         ```
 
 
@@ -2054,7 +2066,7 @@
             $(this).hide();
         })
         ```
-        
+
     - 疑问：ajaxStop这些方法为什么会写在选择器的后面不应该是：$.ajaxStart()吗？
         - ajaxError(callback)
         - ajaxSend(callback)
