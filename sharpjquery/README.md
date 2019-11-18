@@ -20,6 +20,18 @@ var origin   = window.location.origin;   // Returns base URL (https://example.co
 
 ```
 
+2. chrome console 加载 Jquery脚本：
+
+```js
+var jq = document.createElement('script');
+jq.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js";
+document.getElementsByTagName('head')[0].appendChild(jq);
+// ... give time for script to load, then type (or see below for non wait option)
+jQuery.noConflict();
+
+$("#test").length;
+```
+
 
 ##  三大类型元素
 
