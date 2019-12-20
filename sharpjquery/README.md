@@ -1875,18 +1875,20 @@ $("#test").length;
             ```
 
     - $.post(url [, data] [, callback] [, type])
-        ```js
+        - 纯文字数据上传
+            ```js
 
-        $("#send").click(function(){
-            $.post("get.php", 
-                  {"username":$("#username").val(), "passsword":$("#username").val()}, 
-                  function(data, textStatus){
-                      $("#resText").html(data);
-                  }
-           )
-        })
+            $("#send").click(function(){
+                $.post("get.php", 
+                      {"username":$("#username").val(), "passsword":$("#username").val()}, 
+                      function(data, textStatus){
+                          $("#resText").html(data);
+                      }
+               )
+            })
 
-        ```
+            ```
+
 
     - 动态加载脚本$getScript()  和 $.getJSON() 
         ```js
@@ -2009,6 +2011,8 @@ $("#test").length;
     - 注意：
         - encodeURIComponent() 字符编码
 
+
+
 3. 6.6 序列化元素
 
     - serialize()方法: 自动读取form里面所有input，自动编码中文字符
@@ -2050,7 +2054,7 @@ $("#test").length;
                 total_price();
                 console.log(data);
             },
-            error:function (data) {
+            error:function(data) {
                 console.log(data)
             }
         })
@@ -2087,8 +2091,34 @@ $("#test").length;
 
 
 
+5. jquery ajax 上传文件
+    - [文件类型数据上传(uploadfile.html)](https://makitweb.com/how-to-upload-image-file-using-ajax-and-jquery/)
+        ```js
+        $("#send").click(function(){
+            var formData = new FormData();
+            formData.append("username", $("#username").val())
+            formData.append("passsword", $("#username").val())
+            
+            var files = $('#file')[0].files[0];
+            formData.append('file', files);
 
 
+            $.ajax({
+                url: "post.php",
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,  // 这个参数很关键
+                success:function (data) {
+                   $("#resText").html(data);
+                },
+                error:function(data) {
+                    console.log(data)
+                }
+            })
+
+        })
+        ```
 
 
 

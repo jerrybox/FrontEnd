@@ -7,4 +7,4 @@ battleship
 
 ## << 锋利的Jquery >>
 
-1. [README.md](sharpjquery)
+1. [sharpjquery/README.md](sharpjquery)
